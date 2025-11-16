@@ -1,22 +1,36 @@
+// index.js（.env 対応版）
+
 import express from "express";
 import cors from "cors";
 import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+
+// .env を読み込む
+dotenv.config();
 
 const app = express();
 
+// フロントエンドのURLも環境変数から取れるようにしておく
+const FRONT_ORIGIN = process.env.FRONT_ORIGIN || "http://localhost:5173";
+
 app.use(
   cors({
-    origin: "http://localhost:5173", // フロント(Vite)のURL
+    origin: FRONT_ORIGIN, // デフォルトは Vite のURL
   })
 );
 app.use(express.json());
 
-// MySQL 接続設定（さっき作ったユーザー）
+// MySQL 接続設定：環境変数を優先して、なければ今までの値を使う
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "taiping",          // ← CREATE USER したユーザー名
-  password: "tap_pass_123", // ← あなたが決めたパスワード
-  database: "typing_app",   // ← 作ったDB名
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "taiping",          // ← CREATE USER したユーザー名
+  password: process.env.DB_PASSWORD || "tap_pass_123", // ← あなたが決めたパスワード
+  database: process.env.DB_NAME || "typing_app",   // ← 作ったDB名
+});
+
+// 追加: ルートに簡単なメッセージ
+app.get("/", (req, res) => {
+  res.send("Typing API server is running. Try GET /api/prompts ✨");
 });
 
 // GET /api/prompts : お題一覧取得
@@ -60,7 +74,8 @@ app.post("/api/prompts", async (req, res) => {
   }
 });
 
-const PORT = 3001;
+// ポート番号も .env から取れるようにしておくと後で便利
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`API server listening on http://localhost:${PORT}`);
 });

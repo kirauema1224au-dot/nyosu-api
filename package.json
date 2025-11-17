@@ -4,12 +4,13 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "export:prompts": "node scripts/exportPrompts.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^4.21.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "mysql2": "^3.11.0"
   }
 }

@@ -1,53 +1,77 @@
-// index.js（.env 対応版）
+// index.js（DBなし・seed配列だけで動く版）
 
 import express from "express";
 import cors from "cors";
-import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 
-// .env を読み込む
+// .env を読み込む（FRONT_ORIGIN と PORT だけ使う）
 dotenv.config();
 
 const app = express();
 
-// フロントエンドのURLも環境変数から取れるようにしておく
+// フロントエンドのURL（.env に FRONT_ORIGIN があればそれを優先）
 const FRONT_ORIGIN = process.env.FRONT_ORIGIN || "http://localhost:5173";
 
+// CORS と JSON ボディの処理
 app.use(
   cors({
-    origin: FRONT_ORIGIN, // デフォルトは Vite のURL
+    origin: FRONT_ORIGIN,
   })
 );
 app.use(express.json());
 
-// MySQL 接続設定：環境変数を優先して、なければ今までの値を使う
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "taiping",          // ← CREATE USER したユーザー名
-  password: process.env.DB_PASSWORD || "tap_pass_123", // ← あなたが決めたパスワード
-  database: process.env.DB_NAME || "typing_app",   // ← 作ったDB名
-});
+// ★ データベースの代わりに使う seed データ（メモリ上の配列）
+let prompts = [
+  {
+    id: 1,
+    text: "猫が好きです",
+    romaji: "neko ga suki desu",
+    difficulty: 320,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    text: "明日は雨が降ります",
+    romaji: "ashita wa ame ga furimasu",
+    difficulty: 550,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 3,
+    text: "速い車を運転する",
+    romaji: "hayai kuruma wo unten suru",
+    difficulty: 400,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 4,
+    text: "日本語を勉強しています",
+    romaji: "nihongo wo benkyou shiteimasu",
+    difficulty: 600,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 5,
+    text: "プログラミングは楽しい",
+    romaji: "puroguramingu wa tanoshii",
+    difficulty: 750,
+    created_at: new Date().toISOString(),
+  },
+];
 
-// 追加: ルートに簡単なメッセージ
+// ルート：動作確認用
 app.get("/", (req, res) => {
-  res.send("Typing API server is running. Try GET /api/prompts ✨");
+  res.send("Typing API server is running without DB. Try GET /api/prompts ✨");
 });
 
-// GET /api/prompts : お題一覧取得
-app.get("/api/prompts", async (req, res) => {
-  try {
-    const [rows] = await pool.query(
-      "SELECT id, text, romaji, difficulty, created_at FROM prompts ORDER BY id DESC"
-    );
-    res.json(rows);
-  } catch (error) {
-    console.error("GET /api/prompts error", error);
-    res.status(500).json({ error: "Failed to fetch prompts" });
-  }
+// GET /api/prompts : お題一覧取得（新しいidが先に来るように並び替え）
+app.get("/api/prompts", (req, res) => {
+  const sorted = [...prompts].sort((a, b) => b.id - a.id);
+  res.json(sorted);
 });
 
-// POST /api/prompts : お題追加
-app.post("/api/prompts", async (req, res) => {
+// POST /api/prompts : お題追加（配列に追加するだけ）
+app.post("/api/prompts", (req, res) => {
   try {
     const { text, romaji, difficulty } = req.body;
 
@@ -57,24 +81,28 @@ app.post("/api/prompts", async (req, res) => {
       });
     }
 
-    const [result] = await pool.query(
-      "INSERT INTO prompts (text, romaji, difficulty) VALUES (?, ?, ?)",
-      [text, romaji, difficulty]
-    );
+    // いちばん大きい id + 1 を新しい id にする
+    const newId = prompts.length > 0 ? Math.max(...prompts.map((p) => p.id)) + 1 : 1;
 
-    const [rows] = await pool.query(
-      "SELECT id, text, romaji, difficulty, created_at FROM prompts WHERE id = ?",
-      [result.insertId]
-    );
+    const newPrompt = {
+      id: newId,
+      text,
+      romaji,
+      difficulty,
+      created_at: new Date().toISOString(),
+    };
 
-    res.status(201).json(rows[0]);
+    // メモリ上の配列に追加
+    prompts.push(newPrompt);
+
+    res.status(201).json(newPrompt);
   } catch (error) {
     console.error("POST /api/prompts error", error);
     res.status(500).json({ error: "Failed to create prompt" });
   }
 });
 
-// ポート番号も .env から取れるようにしておくと後で便利
+// ポート番号（.env に PORT があればそれを優先）
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`API server listening on http://localhost:${PORT}`);

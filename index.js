@@ -99,6 +99,122 @@ let prompts = [
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
+  {
+    id: 12,
+    text: "キノコよりタケノコ派です",
+    romaji: "kinokoyoritakenokohadesu",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 13,
+    text: "今日の晩御飯はハンバーグです",
+    romaji: "kyounobanngohannhahanba-gudesu",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 14,
+    text: "好きなスポーツは野球です",
+    romaji: "sukinasupo-tuhayakyudesu",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 14,
+    text: "昨日は家族でドライブしました",
+    romaji: "kinouhakazokudedoraibusimasita",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 15,
+    text: "私は虫が苦手です",
+    romaji: "watasihamusiganigatedesu",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 16,
+    text: "友達と旅行に行きます",
+    romaji: "tomodatitoryokouniikimasu",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 17,
+    text: "最近は肌寒いですね",
+    romaji: "saikinnhahadazamuidesune",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 18,
+    text: "好きな科目は歴史です",
+    romaji: "sukinakamokuharekisidesu",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+ {
+    id: 19,
+    text: "私は料理がすきです",
+    romaji: "watasiharyourigasukidesu",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+
+  },
+  {
+    id: 20,
+    text: "午後から予定があります",
+    romaji: "gogokarayoteigaarimasu",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+ {
+    id: 21,
+    text: "新しい鉛筆を買いたい",
+    romaji: "atarasiiennpituwokaitai",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+
+  },
+  {
+    id: 22,
+    text: "今年の干支はへびです",
+    romaji: "kotosinoetohahebidesu",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+    {
+    id: 23,
+    text: "私はてんびん座です",
+    romaji: "watasihatennbinnzadesu",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ];
 
 // ルート：動作確認用

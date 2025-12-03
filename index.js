@@ -39,15 +39,15 @@ let prompts = [
   {
     id: 3,
     text: "速い車を運転する",
-    romaji: "hayaikurumawounntensuru",
-    difficulty: 400,
+    romaji: "hayaikurumawounntennsuru",
+    difficulty: 750,
     created_at: new Date().toISOString(),
   },
   {
     id: 4,
     text: "日本語を勉強しています",
     romaji: "nihonngowobennkyousiteimasu",
-    difficulty: 600,
+    difficulty: 750,
     created_at: new Date().toISOString(),
   },
   {
@@ -68,28 +68,28 @@ let prompts = [
     id: 7,
     text: "今日は友達と遊びます",
     romaji: "kyouhatomodatitoasobimasu",
-    difficulty: 480,
+    difficulty: 750,
     created_at: new Date().toISOString(),
   },
   {
     id: 8,
     text: "美味しいケーキを作る",
     romaji: "oisiike-kiwotukuru",
-    difficulty: 390,
+    difficulty: 400,
     created_at: new Date().toISOString(),
   },
   {
     id: 9,
     text: "朝ご飯を食べました",
     romaji: "asagohannwotabemasita",
-    difficulty: 330,
+    difficulty: 400,
     created_at: new Date().toISOString(),
   },
   {
     id: 10,
     text: "本を読むのが好きです",
     romaji: "honnwoyomunogasukidesu",
-    difficulty: 345,
+    difficulty: 400,
     created_at: new Date().toISOString(),
   },
   {
@@ -155,13 +155,12 @@ let prompts = [
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
- {
+  {
     id: 19,
     text: "私は料理がすきです",
     romaji: "watasiharyourigasukidesu",
     difficulty: 465,
     created_at: new Date().toISOString(),
-
   },
   {
     id: 20,
@@ -170,13 +169,12 @@ let prompts = [
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
- {
+  {
     id: 21,
     text: "新しい鉛筆を買いたい",
     romaji: "atarasiiennpituwokaitai",
     difficulty: 465,
     created_at: new Date().toISOString(),
-
   },
   {
     id: 22,
@@ -185,17 +183,41 @@ let prompts = [
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
-    {
+  {
     id: 23,
     text: "私はてんびん座です",
     romaji: "watasihatennbinnzadesu",
     difficulty: 465,
     created_at: new Date().toISOString(),
-
   },
-
-
-
+  {
+    id: 24,
+    text: "川でバーベキューをした",
+    romaji: "kawadeba-bekyu-wosita",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 25,
+    text: "綺麗なドレスを着た",
+    romaji: "kireinadoresuwokita",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+   {
+    id: 26,
+    text: "家の家事を手伝った",
+    romaji: "ienokaziwotetudatta",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 27,
+    text: "アクション映画を見た",
+    romaji: "akushonneigawomita",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
 
 
 

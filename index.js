@@ -207,7 +207,7 @@ let prompts = [
    {
     id: 26,
     text: "家の家事を手伝った",
-    romaji: "ienokaziwotetudatta",
+    romaji: "ienokajiwotetudatta",
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
@@ -228,14 +228,14 @@ let prompts = [
   {
     id: 29,
     text: "サイテクカレッジ",
-    romaji: "saitekukarejji",
+    romaji: "saitekukarezzi",
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
   {
     id: 30,
     text: "科学の授業があります",
-    romaji: "kagakunojyugyougaarimasu",
+    romaji: "kagakunojugyougaarimasu",
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
@@ -291,7 +291,7 @@ let prompts = [
   {
     id: 38,
     text: "韓国に移住する",
-    romaji: "kannkokuniijyuusuru",
+    romaji: "kannkokuniijuusuru",
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
@@ -309,7 +309,21 @@ let prompts = [
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
-  
+  {
+    id: 41,
+    text: "奇々怪々",
+    romaji: "kikikaikai",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+ {
+    id: 42,
+    text: "喧々諤々",
+    romaji: "kenkengakugaku",
+    difficulty: 465,
+    created_at: new Date().toISOString(),
+  },
+
 
 
 

@@ -1,8 +1,10 @@
-// index.js（DBなし・seed配列だけで動く版）
+// index.js（DBなし・seed配列 + マルチプレイ用 Socket.IO 付き版）
 
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import http from "http";            // ★ 追加：HTTPサーバー
+import { Server } from "socket.io"; // ★ 追加：Socket.IO
 
 // .env を読み込む（FRONT_ORIGIN と PORT だけ使う）
 dotenv.config();
@@ -121,13 +123,6 @@ let prompts = [
     created_at: new Date().toISOString(),
   },
   {
-    id: 14,
-    text: "昨日は家族でドライブをしました",
-    romaji: "kinouhakazokudedoraibuwosimasita",
-    difficulty: 465,
-    created_at: new Date().toISOString(),
-  },
-  {
     id: 15,
     text: "私は虫が苦手です",
     romaji: "watasihamusiganigatedesu",
@@ -204,7 +199,7 @@ let prompts = [
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
-   {
+  {
     id: 26,
     text: "家の家事を手伝った",
     romaji: "ienokajiwotetudatta",
@@ -253,7 +248,7 @@ let prompts = [
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
- {
+  {
     id: 33,
     text: "沖縄県北谷町",
     romaji: "okinawakenntyatanntyou",
@@ -277,7 +272,7 @@ let prompts = [
   {
     id: 36,
     text: "子供の成長ははやい",
-    romaji: "kobomonoseityouhahayai",
+    romaji: "kodomonoseityouhahayai",
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
@@ -302,22 +297,6 @@ let prompts = [
     difficulty: 465,
     created_at: new Date().toISOString(),
   },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ];
 
 // ルート：動作確認用
@@ -343,7 +322,8 @@ app.post("/api/prompts", (req, res) => {
     }
 
     // いちばん大きい id + 1 を新しい id にする
-    const newId = prompts.length > 0 ? Math.max(...prompts.map((p) => p.id)) + 1 : 1;
+    const newId =
+      prompts.length > 0 ? Math.max(...prompts.map((p) => p.id)) + 1 : 1;
 
     const newPrompt = {
       id: newId,
@@ -363,8 +343,139 @@ app.post("/api/prompts", (req, res) => {
   }
 });
 
+//
+// ★★★ ここから Socket.IO（マルチプレイ用）★★★
+//
+
+// ① HTTP サーバーを作る（Express を載せる）
+const server = http.createServer(app);
+
+// ② Socket.IO サーバーを HTTP サーバーにくっつける
+const io = new Server(server, {
+  cors: {
+    origin: FRONT_ORIGIN,
+    methods: ["GET", "POST"],
+  },
+});
+
+// ルームの状態をメモリに保持
+// rooms: Map<roomId, { roomId, isStarted, players }>
+const rooms = new Map();
+
+// 接続時の処理
+io.on("connection", (socket) => {
+  console.log("🔌 connected:", socket.id);
+
+  // ルーム作成
+  socket.on("create_room", ({ name }, callback) => {
+    const roomId = Math.random().toString(36).slice(2, 8); // 例: "ab3k9z"
+
+    const room = {
+      roomId,
+      isStarted: false,
+      players: {}, // socket.id -> { id, name, score, correctCount, mistakeCount }
+    };
+
+    rooms.set(roomId, room);
+
+    room.players[socket.id] = {
+      id: socket.id,
+      name: name || "NoName",
+      score: 0,
+      correctCount: 0,
+      mistakeCount: 0,
+    };
+
+    socket.join(roomId);
+
+    // callback があればルーム情報を返す
+    if (callback) {
+      callback({ roomId, room });
+    }
+
+    // ルーム全員に最新状態を送信
+    io.to(roomId).emit("room_update", room);
+  });
+
+  // ルーム参加
+  socket.on("join_room", ({ roomId, name }, callback) => {
+    const room = rooms.get(roomId);
+    if (!room) {
+      if (callback) {
+        callback({ error: "ルームが見つかりません" });
+      }
+      return;
+    }
+
+    room.players[socket.id] = {
+      id: socket.id,
+      name: name || "NoName",
+      score: 0,
+      correctCount: 0,
+      mistakeCount: 0,
+    };
+
+    socket.join(roomId);
+
+    if (callback) {
+      callback({ roomId, room });
+    }
+
+    io.to(roomId).emit("room_update", room);
+  });
+
+  // ゲーム開始
+  socket.on("start_game", ({ roomId }) => {
+    const room = rooms.get(roomId);
+    if (!room) return;
+
+    room.isStarted = true;
+    io.to(roomId).emit("game_started");
+  });
+
+  // プレイヤーの進捗更新（スコア・正解数・ミス数）
+  socket.on(
+    "progress_update",
+    ({ roomId, score, correctCount, mistakeCount }) => {
+      const room = rooms.get(roomId);
+      if (!room) return;
+
+      const player = room.players[socket.id];
+      if (!player) return;
+
+      // null/undefined なら既存値を維持
+      if (typeof score === "number") player.score = score;
+      if (typeof correctCount === "number") player.correctCount = correctCount;
+      if (typeof mistakeCount === "number") player.mistakeCount = mistakeCount;
+
+      io.to(roomId).emit("room_update", room);
+    }
+  );
+
+  // 切断時
+  socket.on("disconnect", () => {
+    console.log("❌ disconnected:", socket.id);
+
+    for (const [roomId, room] of rooms.entries()) {
+      if (room.players[socket.id]) {
+        delete room.players[socket.id];
+
+        // 残りのメンバーに更新通知
+        io.to(roomId).emit("room_update", room);
+
+        // 誰もいなくなったルームは削除
+        if (Object.keys(room.players).length === 0) {
+          rooms.delete(roomId);
+        }
+      }
+    }
+  });
+});
+
 // ポート番号（.env に PORT があればそれを優先）
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`API server listening on http://localhost:${PORT}`);
+
+// ★ app.listen ではなく server.listen に変更！★
+server.listen(PORT, () => {
+  console.log(`API + Socket.IO server listening on http://localhost:${PORT}`);
 });

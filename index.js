@@ -9,11 +9,14 @@ dotenv.config()
 
 const app = express()
 
-const FRONT_ORIGIN = process.env.FRONT_ORIGIN || "http://localhost:5173"
+const FRONT_ORIGINS = (process.env.FRONT_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean)
 const PORT = process.env.PORT || 3001
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY // ここに入れる（.env に設定）
 
-app.use(cors({ origin: FRONT_ORIGIN }))
+app.use(cors({ origin: FRONT_ORIGINS }))
 app.use(express.json())
 
 // Seed prompts (practice mode)
@@ -155,7 +158,11 @@ const suddenDeathCaptions = {
     { startSec: 285, endSec: 290, text: "この音が止まったら", romaji: "konootogatomattara" },
     { startSec: 290, endSec: 295, text: "そこで手を離すね", romaji: "sokodetewohanasune" },
     { startSec: 295, endSec: 332, text: "さようなら", romaji: "sayounara" },
-  ]
+  ],
+
+  "jpOsSnmem0s": [],
+  "U8pJgoOhiDs": []
+
 }
 
 const supportedVideoIds = new Set(Object.keys(suddenDeathCaptions))
@@ -379,7 +386,7 @@ async function searchYoutubeVideos(query) {
 const server = http.createServer(app)
 
 const io = new Server(server, {
-  cors: { origin: FRONT_ORIGIN, methods: ["GET", "POST"] },
+  cors: { origin: FRONT_ORIGINS, methods: ["GET", "POST"] },
 })
 
 // rooms: Map<roomId, { roomId, isStarted, players }>
@@ -461,7 +468,8 @@ io.on("connection", (socket) => {
 })
 
 server.listen(PORT, () => {
-  console.log(`API + Socket.IO server listening on http://localhost:${PORT} (CORS: ${FRONT_ORIGIN})`)
+  const corsList = Array.isArray(FRONT_ORIGINS) ? FRONT_ORIGINS.join(",") : FRONT_ORIGINS
+  console.log(`API + Socket.IO server listening on http://localhost:${PORT} (CORS: ${corsList})`)
 })
 
 

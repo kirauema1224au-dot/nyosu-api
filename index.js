@@ -14,6 +14,7 @@ const FRONT_ORIGINS = (process.env.FRONT_ORIGIN || "http://localhost:5173")
   .map((s) => s.trim())
   .filter(Boolean)
 const PORT = process.env.PORT || 3001
+const HOST = process.env.HOST || "0.0.0.0"
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY // ここに入れる（.env に設定）
 
 app.use(cors({ origin: FRONT_ORIGINS }))
@@ -521,9 +522,9 @@ io.on("connection", (socket) => {
   })
 })
 
-server.listen(PORT, () => {
+server.listen(PORT, HOST, () => {
   const corsList = Array.isArray(FRONT_ORIGINS) ? FRONT_ORIGINS.join(",") : FRONT_ORIGINS
-  console.log(`API + Socket.IO server listening on http://localhost:${PORT} (CORS: ${corsList})`)
+  console.log(`API + Socket.IO server listening on http://${HOST}:${PORT} (CORS: ${corsList})`)
 })
 
 
